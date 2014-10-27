@@ -39,7 +39,7 @@ _PROTOTYPE( int do_getset, (void)					);
 _PROTOTYPE( void main, (void)						);
 _PROTOTYPE( int do_getprocnr, (void)					);
 _PROTOTYPE( int do_getgroupnr, (void)                                   );
-_PROTOTYPE( int do_setgroupnr, (int)                                    );
+_PROTOTYPE( void do_setgroupnr, (void)                                  );
 
 /* misc.c */
 _PROTOTYPE( int do_reboot, (void)					);

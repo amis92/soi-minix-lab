@@ -194,28 +194,30 @@ PUBLIC int do_getprocnr()
 PUBLIC int do_getgroupnr()
 {
 	int i;
-	for( i = 0; i < NR_PROCS; i++)
+	for( i = 0; i < NR_PROCS; i++ )
 	{
-		if ( ( mproc[i].mp_flags & IN_USE )
-			&& ( mproc[i].mp_pid == pid ) )
+		if( ( mproc[i].mp_flags & IN_USE )
+			&& ( mproc[i].mp_pid == pid) )
 			return mproc[i].mp_group;
 	}
 	return ENOENT;
 }
 
-PUBLIC int do_setgroupnr(int groupnr)
+PUBLIC void do_setgroupnr()
 {
-	if (groupnr > 3 || groupnr < 1)
-		return ENOENT;
 	int i;
+	int groupnr = mm_in.m1_i2;
+	if ( ( groupnr > 3 )
+	 	|| ( groupnr < 1 ) )
+		return;
 	for( i = 0; i < NR_PROCS; i++)
 	{
 		if ( ( mproc[i].mp_flags & IN_USE )
 			&& ( mproc[i].mp_pid == pid ) )
 		{
 			mproc[i].mp_group = groupnr;
-			return 0;
+			return;
 		}
 	}
-	return ENOENT;
+	return;
 }

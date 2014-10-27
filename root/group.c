@@ -2,18 +2,41 @@
 #include <lib.h>
 #include <stdio.h>
 
-int getprocgroup()
+int getprocnr ( int pid )
 {
 	message msg;
-	return _syscall(0, 58, &msg);
-};
+	msg.m1_i1 = pid;
+	return ( _syscall(MM, 50, &msg) );
+}
 
-int main(int argc, char** agrv)
+int getgroupnr ( int pid )
 {
-	for (int i = 0; i < 30; i++)
-	{
-		printf("ProcID: %d", i);
-		printf(" proc group: %d", getprocgroup(i);
-	}
-};
+	message msg;
+	msg.m1_i1 = pid;
+	return ( _syscall(MM, 57, &msg) );
+}
+
+void setgroupnr ( int pid, int groupnr )
+{
+	message msg;
+	msg.m1_i1 = pid;
+	msg.m1_i2 = groupnr;
+	( _syscall(MM, 58, &msg) );
+	return;
+}
+
+#define PROC_TAB_HEADER "PID  syscallPID preGROUP_SET postGROUP_SET\n"
+#define PROC_TAB_TEMPLATE "%3d %11d %12d %13d\n"
+
+int main ( int argc, char* argv [] )
+{
+	int procnr, procgroup;
+	int pid = atoi( argv[1] );
+	procnr = getprocnr( pid );
+	procgroup = getgroupnr ( pid );
+	setgroupnr( pid, 2 );
+	printf(PROC_TAB_HEADER);
+	printf(PROC_TAB_TEMPLATE, pid, procnr, procgroup, getgroupnr( pid ));
+	return 0;
+}
 

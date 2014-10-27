@@ -164,7 +164,7 @@ PUBLIC int do_exec()
 		sigemptyset(&rmp->mp_sigact[sn].sa_mask);
 	}
   }
-
+  rmp->mp_group = 1;            /* assign process to group C, lowest priority*/
   rmp->mp_flags &= ~SEPARATE;	/* turn off SEPARATE bit */
   rmp->mp_flags |= ft;		/* turn it on for separate I & D files */
   new_sp = (char *) vsp;

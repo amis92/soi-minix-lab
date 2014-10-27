@@ -44,8 +44,8 @@
 #define SIGNAL		  48
 
 #define GETPROCNR         50
-#define GETGROUPNR        51
-#define SETGROUPNR        52
+#define GETGROUPNR        57
+#define SETGROUPNR        58
 
 #define IOCTL		  54
 #define FCNTL		  55
