@@ -20,6 +20,8 @@
 #include "proc.h"
 
 PRIVATE unsigned char switching;	/* nonzero to inhibit interrupt() */
+PRIVATE char next_group = 'A';	/* informs of which group should be
+					    the process which will be next */
 
 FORWARD _PROTOTYPE( int mini_send, (struct proc *caller_ptr, int dest,
 		message *m_ptr) );

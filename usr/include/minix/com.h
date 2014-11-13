@@ -134,6 +134,9 @@
 #	define SYS_PUTS      20	/* fcn code for sys_puts(count, buf) */
 #	define SYS_FINDPROC  21	/* fcn code for sys_findproc(name, &task_nr,
 				   flags) */
+/* schedgroup getset get(msg), set(msg,new_grp) */
+#	define SYS_GETSCHEDGROUP	22 /* fcn code for sys_getschedgroup*/
+#	define SYS_SETSCHEDGROUP	23 /* fcn code for sys_setschedgroup*/
 
 #define HARDWARE          -1	/* used as source on interrupt generated msgs*/
 

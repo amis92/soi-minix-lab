@@ -146,6 +146,8 @@ FORWARD _PROTOTYPE( int do_getmap, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_sysctl, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_puts, (message *m_ptr) );
 FORWARD _PROTOTYPE( int do_findproc, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_getschedgroup, (message *m_ptr) );
+FORWARD _PROTOTYPE( int do_setschedgroup, (message *m_ptr) );
 
 
 /*===========================================================================*
@@ -181,6 +183,10 @@ PUBLIC void sys_task()
 	    case SYS_SYSCTL:	r = do_sysctl(&m);	break;
 	    case SYS_PUTS:	r = do_puts(&m);	break;
 	    case SYS_FINDPROC:	r = do_findproc(&m);	break;
+	    case SYS_GETSCHEDGROUP:
+				r = do_getschedgroup(&m); break;
+	    case SYS_SETSCHEDGROUP:
+				r = do_setschedgroup(&m); break;
 	    default:		r = E_BAD_FCN;
 	}
 
@@ -230,6 +236,7 @@ register message *m_ptr;	/* pointer to request message */
   rpc->p_pendcount = 0;
   rpc->p_pid = m_ptr->PID;	/* install child's pid */
   rpc->p_reg.retreg = 0;	/* child sees pid = 0 to know it is child */
+  rpc->p_schedgroup = DEFAULT_SCHEDGROUP; /* child starts in default group */
 
   rpc->user_time = 0;		/* set all the accounting times to 0 */
   rpc->sys_time = 0;
@@ -1008,6 +1015,50 @@ message *m_ptr;			/* pointer to request message */
 	if (strncmp(pp->p_name, m_ptr->m3_ca1, M3_STRING) == 0) {
 		m_ptr->m3_i1 = proc_number(pp);
 		return(OK);
+	}
+  }
+  return(ESRCH);
+}
+
+/*===========================================================================*
+ *				do_getschedgroup			     *
+ *===========================================================================*/
+PRIVATE int do_getschedgroup(m_ptr)
+message *m_ptr;			/* pointer to request message */
+{
+  struct proc *pp;
+
+  for (pp= BEG_PROC_ADDR; pp<END_PROC_ADDR; pp++) {
+	if (istaskp(pp) || isservp(pp))
+		continue;
+	if (pp->p_pid == m_ptr->m1_i1)
+		return (int) pp->p_schedgroup;
+  }
+  return(ESRCH);
+}
+
+/*===========================================================================*
+ *				do_setschedgroup			     *
+ *===========================================================================*/
+PRIVATE int do_setschedgroup(m_ptr)
+message *m_ptr;			/* pointer to request message */
+{
+  struct proc *pp;
+  
+  /* check if correct group */
+  char new_grp = (char) m_ptr->m1_i2;
+  if (new_grp != 'A'
+	|| new_grp != 'B'
+	|| new_grp != 'C')
+      return (EINVAL);
+
+  for (pp= BEG_PROC_ADDR; pp<END_PROC_ADDR; pp++) {
+	if (istaskp(pp) || isservp(pp))
+		continue;
+	if (pp->p_pid == m_ptr->m1_i1)
+	{
+		pp->p_schedgroup = (char) new_grp;
+		return (OK);
 	}
   }
   return(ESRCH);

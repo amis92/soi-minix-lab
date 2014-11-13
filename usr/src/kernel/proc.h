@@ -32,6 +32,7 @@ struct proc {
 
   int p_nr;			/* number of this process (for fast access) */
 
+  char p_schedgroup;		/* scheduling group of this process: A/B/C */
   char p_int_blocked;		/* nonzero if int msg blocked by busy task */
   char p_int_held;		/* nonzero if int msg held by busy syscall */
   struct proc *p_nextheld;	/* next in chain of held-up int processes */
@@ -77,6 +78,9 @@ struct proc {
 #define PPRI_SERVER	2	/* System process outside the kernel */
 #define PPRI_USER	3	/* User process */
 #define PPRI_IDLE	4	/* Idle process */
+
+/* Scheduling definitions */
+#define DEFAULT_SCHEDGROUP 'A'	/* All processes start in A group */
 
 /* Magic process table addresses. */
 #define BEG_PROC_ADDR (&proc[0])

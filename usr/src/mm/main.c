@@ -191,3 +191,17 @@ PUBLIC int do_getprocnr()
 	return ENOENT;
 }
 
+
+PUBLIC int do_getschedgroup()
+{
+	message m = mm_in;
+	/* SYS_GETSCHEDGROUP @ kernel/system.c */
+	return _taskcall(SYSTASK, SYS_GETSCHEDGROUP, &m);
+}
+
+PUBLIC int do_setschedgroup()
+{
+	message m = mm_in;
+	/* SYS_SETSCHEDGROUP @ kernel/system.c */
+	return _taskcall(SYSTASK, SYS_SETSCHEDGROUP, &m);
+}
