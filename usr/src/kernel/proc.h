@@ -81,6 +81,7 @@ struct proc {
 
 /* Scheduling definitions */
 #define DEFAULT_SCHEDGROUP 'A'	/* All processes start in A group */
+#define LAST_SCHEDGROUP 'C'	/* last group to be correct */
 
 /* Magic process table addresses. */
 #define BEG_PROC_ADDR (&proc[0])

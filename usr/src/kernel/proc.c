@@ -430,6 +430,15 @@ register struct proc *rp;	/* this process is no longer runnable */
   if (*qtail == rp) *qtail = xp;
 }
 
+PRIVATE char next(char group)
+{
+  
+	group = group + 1;
+	group = group > LAST_SCHEDGROUP ? DEFAULT_SCHEDGROUP 
+						  : group;
+	return group;
+}
+
 /*===========================================================================*
  *				sched					     * 
  *===========================================================================*/
@@ -439,14 +448,53 @@ PRIVATE void sched()
  * process is runnable, put the current process on the end of the user queue,
  * possibly promoting another user to head of the queue.
  */
+  struct proc *next;
 
   if (rdy_head[USER_Q] == NIL_PROC) return;
 
   /* One or more user processes queued. */
-  rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q];
-  rdy_tail[USER_Q] = rdy_head[USER_Q];
-  rdy_head[USER_Q] = rdy_head[USER_Q]->p_nextready;
+  rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q]; /* put curr after last */
+  rdy_tail[USER_Q] = rdy_head[USER_Q];		    /* curr is called last */
+  /* now we have unending/closed-in-circle list */
+  
+  /* searching for process of next group */
+  next = rdy_head[USER_Q]->p_nextready;		/* start from the next one */
+  
+  while (next->p_schedgroup != next_group 	/* first of matching group */
+	&& next != rdy_head[USER_Q])		/* or we loopback to current */
+  {
+	next = next->p_nextready;
+  }
+  /* next group wasn't found, but because there are only three groups
+      we search for second next, or for next of the same group */
+  if (next == rdy_head[USER_Q])
+  {
+	next_group = next(next_group);
+	next = rdy_head[USER_Q]->p_nextready;	/* start from the next one */
+	
+	while (next->p_schedgroup != next_group
+	      && next != rdy_head[USER_Q])
+	{
+		next = next->p_nextready;
+	}
+	/* if we didn't find third group, we search for next of the curr */
+	if (next == rdy_head[USER_Q])
+	{
+		next_group = rdy_head[USER_Q];
+		next = rdy_head[USER_Q]->p_nextready; /* the next one */
+		
+		while (next->p_schedgroup != next_group
+		      && next != rdy_head[USER_Q])
+		{
+		      next = next->p_nextready;
+		}
+	}
+  }
+  /* now we surely have next process chosen in 'next' */
+  rdy_head[USER_Q] = next;
+  /* now we need to break unending/closed list */
   rdy_tail[USER_Q]->p_nextready = NIL_PROC;
+  /* we choose between task/server/user processes */
   pick_proc();
 }
 
