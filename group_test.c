@@ -24,24 +24,24 @@ int main(int argc, char* argv[])
   
   if (argc != 3)
   {
-    printf("### Usage: %s <app_pid> <new_group:A/B/C>", argv[0]);
+    printf("> Usage: %s <app_pid> <new_group:A/B/C>\n", argv[0]);
     return 0;
   }
   
   group = getgroup(pid);
-  printf("> process pid=%d is of group=%c\n", pid, group);
+  printf("> Process pid=%d is of group '%c'\n", pid, group);
   
   group = argv[2][0];
   if (group <'A' || group > 'C')
   {
-    printf(">Invalid group code. Only A,B or C is allowed");
+    printf("> Invalid group code. Only A,B or C is allowed\n");
     return 0;
   }
   
-  printf("changing group to '%c'...\n", group);
+  printf("> Changing group to '%c'...\n", group);
   setgroup(pid, group);
   
   group = getgroup(pid);
-  printf("> process pid=%d is now of group=%c\n", pid, group);
+  printf("> Process pid=%d is now of group '%c'\n", pid, group);
   return 0;
 }
