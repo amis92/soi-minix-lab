@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
   pid_t pid = getpid();
   char group;
-  int index, result;
+  int dummy = 1;
   result = 1;
   
   if (argc != 2)
@@ -41,8 +41,7 @@ int main(int argc, char* argv[])
   
   while (TRUE)
   {
-    result = result * index;
-    index = result % index;
+    dummy = (dummy + 1) % 2048;
   }
   return 0;
 }
