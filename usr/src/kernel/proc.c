@@ -30,6 +30,7 @@ FORWARD _PROTOTYPE( void ready, (struct proc *rp) );
 FORWARD _PROTOTYPE( void sched, (void) );
 FORWARD _PROTOTYPE( void unready, (struct proc *rp) );
 FORWARD _PROTOTYPE( void pick_proc, (void) );
+FORWARD _PROTOTYPE( char next, (char group) );
 
 #if (CHIP == M68000)
 FORWARD _PROTOTYPE( void cp_mess, (int src, struct proc *src_p, message *src_m,
@@ -429,7 +430,8 @@ register struct proc *rp;	/* this process is no longer runnable */
   if (*qtail == rp) *qtail = xp;
 }
 
-PRIVATE char next(char group)
+PRIVATE char next(group)
+char group;
 {
   
 	group = group + 1;

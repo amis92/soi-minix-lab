@@ -1,8 +1,11 @@
+#define TRUE 1
+
+
 int main()
 {
   int index, result;
   result = 1;
-  while (true)
+  while (TRUE)
   {
     result = result * index;
     index = result % index;
