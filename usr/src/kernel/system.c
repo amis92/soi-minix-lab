@@ -1047,9 +1047,8 @@ message *m_ptr;			/* pointer to request message */
   
   /* check if correct group */
   char new_grp = (char) m_ptr->m1_i2;
-  if (new_grp != 'A'
-	|| new_grp != 'B'
-	|| new_grp != 'C')
+  if (new_grp < DEFAULT_SCHEDGROUP
+	|| new_grp > LAST_SCHEDGROUP)
       return (EINVAL);
 
   for (pp= BEG_PROC_ADDR; pp<END_PROC_ADDR; pp++) {
