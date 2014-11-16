@@ -23,12 +23,21 @@ int main(int argc, char* argv[])
   int pid = atoi(argv[1]);
   
   if (argc != 3)
+  {
     printf("### Usage: %s <app_pid> <new_group:A/B/C>", argv[0]);
+    return 0;
+  }
   
   group = getgroup(pid);
   printf("> process pid=%d is of group=%c\n", pid, group);
   
-  group = (char) atoi(argv[2]);
+  group = argv[2][0];
+  if (group <'A' || group > 'C')
+  {
+    printf(">Invalid group code. Only A,B or C is allowed");
+    return 0;
+  }
+  
   printf("changing group to '%c'...\n", group);
   setgroup(pid, group);
   
