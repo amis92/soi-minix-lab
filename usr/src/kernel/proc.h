@@ -81,7 +81,11 @@ struct proc {
 
 /* Scheduling definitions */
 #define DEFAULT_SCHEDGROUP 'A'	/* All processes start in A group */
+#define A_SCHEDGROUP_TICKETS 5 /* number of time quants assigned */
+#define B_SCHEDGROUP_TICKETS 10 /* number of time quants assigned */
+#define C_SCHEDGROUP_TICKETS 2 /* number of time quants assigned */
 #define LAST_SCHEDGROUP 'C'	/* last group to be correct */
+#define SCHEDGROUP_COUNT 3
 
 /* Magic process table addresses. */
 #define BEG_PROC_ADDR (&proc[0])

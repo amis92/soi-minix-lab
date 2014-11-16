@@ -20,8 +20,7 @@
 #include "proc.h"
 
 PRIVATE unsigned char switching;	/* nonzero to inhibit interrupt() */
-PRIVATE char next_group = 'A';	/* informs of which group should be
-					    the process which will be next */
+PRIVATE int tickets_left = A_SCHEDGROUP_TICKETS;
 
 FORWARD _PROTOTYPE( int mini_send, (struct proc *caller_ptr, int dest,
 		message *m_ptr) );
@@ -448,52 +447,53 @@ PRIVATE void sched()
  * process is runnable, put the current process on the end of the user queue,
  * possibly promoting another user to head of the queue.
  */
-  struct proc *next;
+  struct proc *next, *head;
+  int i;
+  char next_group;
+
 
   if (rdy_head[USER_Q] == NIL_PROC) return;
 
+  /* init */
+  head = rdy_head[USER_Q];
+  --tickets_left;
+  next_group = head->p_schedgroup;
+  if (tickets_left > 0) {
+	  /* it still has it's time, actually */
+	  pick_proc();
+	  return;
+  }
+
   /* One or more user processes queued. */
-  rdy_tail[USER_Q]->p_nextready = rdy_head[USER_Q]; /* put curr after last */
-  rdy_tail[USER_Q] = rdy_head[USER_Q];		    /* curr is called last */
+  rdy_tail[USER_Q]->p_nextready = head; /* put curr after last */
+  rdy_tail[USER_Q] = head;		    /* curr is called last */
   /* now we have unending/closed-in-circle list */
-  
+
   /* searching for process of next group */
-  next = rdy_head[USER_Q]->p_nextready;		/* start from the next one */
-  
-  while (next->p_schedgroup != next_group 	/* first of matching group */
-	&& next != rdy_head[USER_Q])		/* or we loopback to current */
+  for (i = 0; i < SCHEDGROUP_COUNT; ++i)
   {
-	next = next->p_nextready;
+	  next_group = next(next_group);
+	  next = head->p_nextready;		/* start from the next one */
+
+	  while (next->p_schedgroup != next_group 	/* first of matching group */
+		  && next != head)		/* or we loopback to current */
+	  {
+		  next = next->p_nextready;
+	  }
+	  if (next != head) break;
   }
-  /* next group wasn't found, but because there are only three groups
-      we search for second next, or for next of the same group */
-  if (next == rdy_head[USER_Q])
-  {
-	next_group = next(next_group);
-	next = rdy_head[USER_Q]->p_nextready;	/* start from the next one */
-	
-	while (next->p_schedgroup != next_group
-	      && next != rdy_head[USER_Q])
-	{
-		next = next->p_nextready;
-	}
-	/* if we didn't find third group, we search for next of the curr */
-	if (next == rdy_head[USER_Q])
-	{
-		next_group = rdy_head[USER_Q];
-		next = rdy_head[USER_Q]->p_nextready; /* the next one */
-		
-		while (next->p_schedgroup != next_group
-		      && next != rdy_head[USER_Q])
-		{
-		      next = next->p_nextready;
-		}
-	}
-  }
+
   /* now we surely have next process chosen in 'next' */
-  rdy_head[USER_Q] = next;
+  switch (next->p_schedgroup)
+  {
+  case 'A': tickets_left = A_SCHEDGROUP_TICKETS; break;
+  case 'B': tickets_left = B_SCHEDGROUP_TICKETS; break;
+  case 'C': tickets_left = C_SCHEDGROUP_TICKETS; break;
+  }
   /* now we need to break unending/closed list */
+  rdy_head[USER_Q] = next;
   rdy_tail[USER_Q]->p_nextready = NIL_PROC;
+
   /* we choose between task/server/user processes */
   pick_proc();
 }
