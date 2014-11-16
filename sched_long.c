@@ -13,7 +13,6 @@ int main(int argc, char* argv[])
   pid_t pid = getpid();
   char group;
   int dummy = 1;
-  result = 1;
   
   if (argc != 2)
   {
