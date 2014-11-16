@@ -20,12 +20,15 @@ void setgroup(int pid, char group)
 int main(int argc, char* argv[])
 {
   char group;
-  int pid = atoi(argv[0]);
+  int pid = atoi(argv[1]);
+  
+  if (argc != 3)
+    printf("### Usage: %s <app_pid> <new_group:A/B/C>", argv[0]);
   
   group = getgroup(pid);
   printf("> process pid=%d is of group=%c\n", pid, group);
   
-  group = (char) atoi(argv[1]);
+  group = (char) atoi(argv[2]);
   printf("changing group to '%c'...\n", group);
   setgroup(pid, group);
   
