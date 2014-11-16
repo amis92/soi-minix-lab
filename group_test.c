@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <lib.h>
 
 char getgroup(int pid)
 {
   message m;
   m.m1_i1 = pid;
-  return _syscall(SYS_GETSCHEDGROUP, &m, 0);
+  return _syscall(MM, GETSCHEDGROUP, &m);
 }
 
 void setgroup(int pid, char group)
@@ -13,7 +14,7 @@ void setgroup(int pid, char group)
   message m;
   m.m1_i1 = pid;
   m.m1_i2 = group;
-  _syscall(SYS_SETSCHEDGROUP, &m, 0);
+  _syscall(MM, SETSCHEDGROUP, &m);
 }
 
 int main(int argc, char* argv[])
